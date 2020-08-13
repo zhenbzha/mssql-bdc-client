@@ -10,14 +10,12 @@ Only prerequisites is to have docker installed on local machine.
 3. inside container, log in to Azure `az login`
 4. deploy BDC `python3 ./deploy-sql-big-data-aks.py` 
 you need to input the subscription id, resource group name and region. Keep all others as default
-5. set environment variables
+5. set environment variables. If you are not using all default values in step 4, then update the values here accordingly as you specified in step 4.
 
-```
-export AZDATA_USERNAME=admin
-export AZDATA_PASSWORD=MySQLBigData2019
-```
-
-If you are not using all default values in step 4, then update the values here accordingly as you specified in step 4.
+    ```
+    export AZDATA_USERNAME=admin
+    export AZDATA_PASSWORD=MySQLBigData2019
+    ```
 6. load sample data into BDC
 first run `kubectl get svc -n sqlbigdata` (sqlbigdata is the default BDC cluster name. if you specify different value in step 4, then use it here)
 find the external ip of SQL_MASTER_ENDPOINT(master-svc-external) and KNOX_ENDPOINT(gateway-svc-external), then run command to load sample data to BDC
