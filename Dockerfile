@@ -1,6 +1,8 @@
-FROM ubuntu:18.04
+FROM jupyter/all-spark-notebook:ubuntu-18.04
 
-ENV dir /bdc
+ENV dir bdc
+
+USER root
 
 # install prerequisites
 RUN apt-get update && apt-get install -y \
@@ -49,8 +51,8 @@ RUN apt-get update && apt-get install -y \
 # install Azure cli
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
+USER $NB_UID
+
 RUN mkdir ${dir}
 WORKDIR ${dir}
-COPY ./bootstrap-sample-db.sh ${dir}
-COPY ./bootstrap-sample-db.sql ${dir}
-COPY ./deploy-sql-big-data-aks.py ${dir}
+COPY . .
