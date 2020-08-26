@@ -45,8 +45,7 @@ RUN /bin/bash -c "source ~/.bashrc"
 RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
 RUN add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/18.04/mssql-server-2019.list)"
 
-RUN apt-get update && apt-get install -y \
-    azdata-cli
+RUN apt-get update && apt-get install -y azdata-cli
 
 # install Azure cli
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
