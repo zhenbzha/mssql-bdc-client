@@ -2,10 +2,10 @@
 
 
 ## Prerquisites
+
 Only prerequisites is to have docker installed on local machine. 
 
 ## Steps
-
 
 1. login to docker hub `docker login --username=[yourdochubusername]`
 2. download and run the BDC client container `docker run -it --name mssql-bdc-client -p 8888:8888  mssql-bdc-client`
@@ -14,4 +14,8 @@ Only prerequisites is to have docker installed on local machine.
 5. run `./bootstrap.sh` 
 you need to first login to Azure with code and then input the subscription id, resource group name and region. Keep all others as default
 This will finish create BDC in Azure with all sample data loaded into the cluster
+
+## References
+
+[azdata commnds reference](https://docs.microsoft.com/en-us/sql/big-data-cluster/reference-azdata-bdc?view=sql-server-ver15)
 
