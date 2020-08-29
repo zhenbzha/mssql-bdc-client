@@ -1,11 +1,16 @@
-FROM jupyter/all-spark-notebook:ubuntu-18.04
+FROM ubuntu:18.04
 
-ENV dir bdc
+ARG dir=bdc
+ARG group=bdcadmin
+ARG user=bdcadmin
+ARG password=password
 
-USER root
+# create user and work dir
+RUN groupadd -r ${group} && useradd --no-log-init --create-home -g ${group} ${user} && echo "${user}:${password}" | chpasswd && adduser bdcadmin sudo
 
 # install prerequisites
 RUN apt-get update && apt-get install -y \
+    sudo \
     curl \
     python3.6 \
     apt-transport-https \
@@ -17,7 +22,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     software-properties-common \
-    lsb-release
+    lsb-release    
 
 # install sqlcmd
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
@@ -50,8 +55,12 @@ RUN apt-get update && apt-get install -y azdata-cli
 # install Azure cli
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
-USER $NB_UID
+USER ${user}
 
-RUN mkdir ${dir}
-WORKDIR ${dir}
-COPY . .
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+RUN /bin/bash -c 'source ~/.bashrc'
+
+RUN mkdir /home/${user}/${dir}
+WORKDIR /home/${user}/${dir}
+
+COPY --chown=${user}:${group} . .

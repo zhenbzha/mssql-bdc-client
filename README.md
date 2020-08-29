@@ -12,7 +12,7 @@ Only prerequisites is to have docker installed on local machine.
 3. Open jupyter notebook with URL provided in console
 4. Open a terminal within jupyter notebook
 5. run `./bootstrap.sh` 
-you need to first login to Azure with code and then input the subscription id, resource group name and region. Keep all others as default
+you need to first login to Azure and then input the subscription id, resource group name and region. Keep all others as default
 This will finish create BDC in Azure with all sample data loaded into the cluster
 
 ## References
