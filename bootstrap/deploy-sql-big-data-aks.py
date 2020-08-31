@@ -33,7 +33,7 @@ GROUP_NAME = input("Provide Azure resource group name to be created:").strip()
 #
 # Optionally change these configuration settings
 #
-AZURE_REGION=input("Provide Azure region - Press ENTER for using `westus`:").strip() or "westus"
+AZURE_REGION=input("Provide Azure region - Press ENTER for using `westeurope`:").strip() or "westeurope"
 VM_SIZE=input("Provide VM size for the AKS cluster - Press ENTER for using  `Standard_L8s`:").strip() or "Standard_L8s"
 AKS_NODE_COUNT=input("Provide number of worker nodes for AKS cluster - Press ENTER for using  `1`:").strip() or "1"
 
