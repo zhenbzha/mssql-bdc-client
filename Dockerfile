@@ -65,5 +65,7 @@ RUN mkdir /home/${user}/${dir}
 WORKDIR /home/${user}/${dir}
 
 COPY --chown=${user}:${group} . .
+RUN chmod ug+x /home/${user}/${dir}/bootstrap/bootstrap.sh
+RUN chmod ug+x /home/${user}/${dir}/bootstrap/bootstrap-sample-db.sh
 
 CMD ["tail", "-f", "/dev/null"]
