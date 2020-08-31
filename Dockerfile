@@ -22,7 +22,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     software-properties-common \
-    lsb-release    
+    lsb-release \
+    iputils-ping
 
 # install sqlcmd
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
@@ -64,3 +65,5 @@ RUN mkdir /home/${user}/${dir}
 WORKDIR /home/${user}/${dir}
 
 COPY --chown=${user}:${group} . .
+
+CMD ["tail", "-f", "/dev/null"]
