@@ -127,55 +127,48 @@ then
     done
 fi
 
-for table in web_clickstreams inventory customer
-    do
-    echo Exporting $table data...
-    if [ $table == web_clickstreams ]
-    then 
-        DELIMITER=,
-    else
-        DELIMITER="|"
-    fi
-    # WSL ex: "/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/130/Tools/Binn/bcp.exe"
-    if [ ! -f $table.csv ]
-    then
-        $DEBUG bcp sales.dbo.$table out "$table.csv" -S $SQLCMDSERVER $BCP_CREDENTIALS -c -t"$DELIMITER" -e "$table.err" > "$table.out" || (echo $ERROR_MESSAGE && kill -9 $PROC_ID > /dev/null && exit 3)
-    fi
-done
-
-if [ ! -f product_reviews.csv ]
-then
-    echo Exporting product_reviews data...
-    $DEBUG bcp "select pr_review_sk, replace(replace(pr_review_content, ',', ';'), char(34), '') as pr_review_content from sales.dbo.product_reviews" queryout "product_reviews.csv" -S $SQLCMDSERVER $BCP_CREDENTIALS -c -t, -e "product_reviews.err" > "$table.out" || (echo $ERROR_MESSAGE && kill -9 $PROC_ID > /dev/null && exit 3)
-fi
-
 if [[ $PROC_ID ]]
 then
     kill -9 $PROC_ID > /dev/null
 fi
 
+# Download source files
+echo Downloading source files...
+$DEBUG curl -G "https://solliancepublicdata.blob.core.windows.net/mcw-moderndata/customers.csv" -o customers.csv
+$DEBUG curl -G "https://solliancepublicdata.blob.core.windows.net/mcw-moderndata/products.csv" -o products.csv
+$DEBUG curl -G "https://solliancepublicdata.blob.core.windows.net/mcw-moderndata/web_clickstreams.csv" -o web_clickstreams.csv
+
 # Copy the data file to HDFS
 echo Uploading web_clickstreams data to HDFS...
 if [[ $KNOX_PASSWORD ]]
 then
-    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/clickstream_data?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 4)
-    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/clickstream_data/web_clickstreams.csv?op=create&overwrite=true" -H 'Content-Type: application/octet-stream' -T "web_clickstreams.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 5)
+    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/web_logs?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 4)
+    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/web_logs/web_clickstreams.csv?op=create&overwrite=true" -H 'Content-Type: application/octet-stream' -T "web_clickstreams.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 5)
 else
-    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/clickstream_data?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 4)
-    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/clickstream_data/web_clickstreams.csv?op=create&overwrite=true" -H 'Content-Type: application/octet-stream' -T "web_clickstreams.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 5)
+    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/web_logs?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 4)
+    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/web_logs/web_clickstreams.csv?op=create&overwrite=true" -H 'Content-Type: application/octet-stream' -T "web_clickstreams.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 5)
 fi
-#$DEBUG rm -f web_clickstreams.*
 
-echo Uploading product_reviews data to HDFS...
+echo Uploading customers data to HDFS...
 if [[ $KNOX_PASSWORD ]]
 then
-    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/product_review_data?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 6)
-    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/product_review_data/product_reviews.csv?op=create&overwrite=true" -H "Content-Type: application/octet-stream" -T "product_reviews.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 7)
+    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_customers?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 6)
+    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_customers/customers.csv?op=create&overwrite=true" -H "Content-Type: application/octet-stream" -T "customers.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 7)
 else
-    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/product_review_data?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 6)
-    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/product_review_data/product_reviews.csv?op=create&overwrite=true" -H "Content-Type: application/octet-stream" -T "product_reviews.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 7)
+    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_customers?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 6)
+    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_customers/customers.csv?op=create&overwrite=true" -H "Content-Type: application/octet-stream" -T "customers.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 7)
 fi
-#$DEBUG rm -f product_reviews.*
+
+echo Uploading products data to HDFS...
+if [[ $KNOX_PASSWORD ]]
+then
+    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_products?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 6)
+    $DEBUG curl -s -S -L -k -u root:$KNOX_PASSWORD -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_products/products.csv?op=create&overwrite=true" -H "Content-Type: application/octet-stream" -T "products.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 7)
+else
+    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_products?op=MKDIRS" 1>/dev/null || (echo $ERROR_MESSAGE && exit 6)
+    $DEBUG curl -s -S -L -k -u : --negotiate -X PUT "https://$KNOX_ENDPOINT/gateway/default/webhdfs/v1/partner_products/products.csv?op=create&overwrite=true" -H "Content-Type: application/octet-stream" -T "products.csv" 1>/dev/null || (echo $ERROR_MESSAGE && exit 7)
+fi
+
 
 echo Bootstrap of the sample database completed successfully.
 echo Data files for Oracle setup are located at [/tmp/$TMP_DIR_NAME].
