@@ -7,7 +7,7 @@ Only prerequisites is to have docker installed on local machine.
 
 ## Steps
 
-1. download and run the BDC client container `docker run -it --name mssql-bdc-client mssql-bdc-client /bin/bash`
+1. download and run the BDC client container `docker run -it --name mssql-bdc-client zhenbzha/mssql-bdc-client /bin/bash`
 2. inside docker, `cd bootstrap`
 3. run `./bootstrap.sh` 
 you need to first login to Azure and then input the subscription id, resource group name and region. Keep all others as default
